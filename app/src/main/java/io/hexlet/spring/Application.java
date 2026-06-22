@@ -1,4 +1,4 @@
-package hexlet_spring_blog.app;
+package io.hexlet.spring;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,6 +15,10 @@ public class Application {
 	@GetMapping("/")
 	String home() {
 		return "Hello World!";
+	}
+	@GetMapping("/about")
+	public String about() {
+		return "This is my Sprig Boot project)";
 	}
 
 }

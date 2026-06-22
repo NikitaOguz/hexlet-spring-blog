@@ -1,4 +1,4 @@
-package hexlet_spring_blog.app;
+package io.hexlet.spring;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
