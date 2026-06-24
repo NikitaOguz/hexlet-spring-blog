@@ -23,6 +23,11 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.springframework.boot:spring-boot-devtools")
+	compileOnly ("org.projectlombok:lombok:1.18.38")
+	annotationProcessor ("org.projectlombok:lombok:1.18.38")
+
+	testCompileOnly ("org.projectlombok:lombok:1.18.38")
+	testAnnotationProcessor ("org.projectlombok:lombok:1.18.38")
 }
 
 tasks.withType<Test> {
