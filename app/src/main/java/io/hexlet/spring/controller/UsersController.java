@@ -1,5 +1,6 @@
 package io.hexlet.spring.controller;
 import io.hexlet.spring.model.User;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
