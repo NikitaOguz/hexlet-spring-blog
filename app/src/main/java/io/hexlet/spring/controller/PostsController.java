@@ -1,6 +1,9 @@
 package io.hexlet.spring.controller;
 
+import io.hexlet.spring.exception.ResourceNotFoundException;
 import io.hexlet.spring.model.Post;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,34 +28,31 @@ public class PostsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> show(@PathVariable Long id) {
+    public Post show(@PathVariable Long id) {
         return posts.stream()
                 .filter(post -> post.getId().equals(id))
                 .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Post with id " + id + " not found"));
     }
 
     @PostMapping
-    public ResponseEntity<Post> create(@RequestBody Post post) {
+    public ResponseEntity<Post> create(@Valid @RequestBody Post post) {
         posts.add(post);
-        return ResponseEntity.status(201).body(post);
+        return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Post> update(
             @PathVariable Long id,
-            @RequestBody Post data) {
+            @Valid @RequestBody Post data) {
 
-        var maybePost = posts.stream()
-                .filter(post -> post.getId().equals(id))
-                .findFirst();
+        var post = posts.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Post with id " + id + " not found"));
 
-        if (maybePost.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        var post = maybePost.get();
         post.setTitle(data.getTitle());
         post.setContent(data.getContent());
         post.setAuthor(data.getAuthor());
@@ -63,7 +63,15 @@ public class PostsController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> destroy(@PathVariable Long id) {
-        posts.removeIf(post -> post.getId().equals(id));
+
+        var post = posts.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Post with id " + id + " not found"));
+
+        posts.remove(post);
+
         return ResponseEntity.noContent().build();
     }
 }
