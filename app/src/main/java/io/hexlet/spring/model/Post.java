@@ -39,4 +39,6 @@ public class Post {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    private boolean published;
 }

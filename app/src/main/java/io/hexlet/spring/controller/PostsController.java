@@ -2,7 +2,12 @@ package io.hexlet.spring.controller;
 
 import io.hexlet.spring.exception.ResourceNotFoundException;
 import io.hexlet.spring.model.Post;
+import io.hexlet.spring.repository.PostRepository;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,32 +19,37 @@ import java.util.List;
 @RequestMapping("/api/posts")
 public class PostsController {
 
-    private final List<Post> posts = new ArrayList<>();
+    private final PostRepository postRepository;
+
+    public PostsController(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     @GetMapping
-    public ResponseEntity<List<Post>> index(
-            @RequestParam(defaultValue = "10") Integer limit) {
+    public Page<Post> index(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        var result = posts.stream().limit(limit).toList();
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by("createdAt").descending()
+        );
 
-        return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(posts.size()))
-                .body(result);
+        return postRepository.findByPublishedTrue(pageable);
     }
 
     @GetMapping("/{id}")
     public Post show(@PathVariable Long id) {
-        return posts.stream()
-                .filter(post -> post.getId().equals(id))
-                .findFirst()
+        return postRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Post with id " + id + " not found"));
     }
 
     @PostMapping
     public ResponseEntity<Post> create(@Valid @RequestBody Post post) {
-        posts.add(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(post);
+        Post saved = postRepository.save(post);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @PutMapping("/{id}")
@@ -47,9 +57,7 @@ public class PostsController {
             @PathVariable Long id,
             @Valid @RequestBody Post data) {
 
-        var post = posts.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
+        var post = postRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Post with id " + id + " not found"));
 
@@ -58,19 +66,17 @@ public class PostsController {
         post.setAuthor(data.getAuthor());
         post.setCreatedAt(data.getCreatedAt());
 
-        return ResponseEntity.ok(post);
+        return ResponseEntity.ok(postRepository.save(post));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> destroy(@PathVariable Long id) {
 
-        var post = posts.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
+        Post post = postRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Post with id " + id + " not found"));
 
-        posts.remove(post);
+        postRepository.delete(post);
 
         return ResponseEntity.noContent().build();
     }
