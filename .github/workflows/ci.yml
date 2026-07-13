@@ -2,21 +2,25 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
+
       - uses: actions/checkout@v4
 
-      - name: Grant execute permission for gradlew
+      - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Set up JDK
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -25,16 +29,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build and Test
+      - name: Build and tests
         run: ./gradlew clean build
-
-      - name: Generate JaCoCo Report
-        run: ./gradlew jacocoTestReport
 
       - name: Coverage report
         run: ./gradlew jacocoTestReport
 
-      - name: SonarQube Scan
+      - name: SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonar
