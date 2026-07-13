@@ -45,9 +45,6 @@ dependencies {
 tasks.test {
 	useJUnitPlatform()
 }
-tasks.withType<Test> {
-	useJUnitPlatform()
-}
 jacoco {
 	toolVersion = "0.8.13"
 }
@@ -68,10 +65,16 @@ sonar {
 	properties {
 		property("sonar.projectKey", "NikitaOguz_hexlet-spring-blog")
 		property("sonar.organization", "nikitoguzkov")
-		property("sonar.host.url", "https://sonarcloud.io") // или ваш SonarQube
-		property("sonar.java.coveragePlugin", "jacoco")
-		property("sonar.junit.reportPaths", "build/test-results/test")
-		property("sonar.jacoco.reportPaths", "build/jacoco/test.exec")
-		property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+		property("sonar.host.url", "https://sonarcloud.io")
+
+		property(
+			"sonar.coverage.jacoco.xmlReportPaths",
+			"build/reports/jacoco/test/jacocoTestReport.xml"
+		)
+
+		property(
+			"sonar.junit.reportPaths",
+			"build/test-results/test"
+		)
 	}
 }
