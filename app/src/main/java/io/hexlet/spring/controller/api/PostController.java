@@ -1,4 +1,4 @@
-package io.hexlet.spring.controller;
+package io.hexlet.spring.controller.api;
 
 import io.hexlet.spring.exception.ResourceNotFoundException;
 import io.hexlet.spring.model.Post;
