@@ -23,14 +23,14 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Title can't be blank")
-    @Size(min = 2, max = 255, message = "Title must contain from 2 to 255 characters")
+    @NotBlank
+    @Size(min = 2, max = 255)
     private String title;
 
-    @NotBlank(message = "Content can't be blank")
+    @NotBlank
     private String content;
 
-    @NotBlank(message = "Author can't be blank")
+    @NotBlank
     private String author;
 
     @CreatedDate

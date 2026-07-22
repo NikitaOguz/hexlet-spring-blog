@@ -1,6 +1,8 @@
 package io.hexlet.spring.controller.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.hexlet.spring.dto.UserDTO;
+import io.hexlet.spring.mapper.UserMapper;
 import io.hexlet.spring.model.User;
 import io.hexlet.spring.repository.UserRepository;
 import net.datafaker.Faker;
@@ -16,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -34,6 +38,8 @@ class UsersControllerTest {
 
     @Autowired
     private Faker faker;
+
+    private final UserMapper mapper = new UserMapper();
 
     @BeforeEach
     void setUp() {
@@ -91,5 +97,22 @@ class UsersControllerTest {
                 .andExpect(status().isNoContent());
 
         assertThat(userRepository.findById(user.getId())).isEmpty();
+    }
+    @Test
+    void shouldMapUserToDTO() {
+
+        User user = new User();
+        user.setId(1L);
+        user.setFirstName("Ivan");
+        user.setLastName("Ivanov");
+        user.setEmail("ivan@test.com");
+
+        UserDTO dto = mapper.toDTO(user);
+
+        assertNotNull(dto);
+        assertEquals(1L, dto.getId());
+        assertEquals("Ivan", dto.getFirstName());
+        assertEquals("Ivanov", dto.getLastName());
+        assertEquals("ivan@test.com", dto.getEmail());
     }
 }

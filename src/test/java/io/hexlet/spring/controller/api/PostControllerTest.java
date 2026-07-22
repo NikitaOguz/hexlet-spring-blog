@@ -1,6 +1,8 @@
 package io.hexlet.spring.controller.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.hexlet.spring.dto.PostDTO;
+import io.hexlet.spring.mapper.PostMapper;
 import io.hexlet.spring.model.Post;
 import io.hexlet.spring.repository.PostRepository;
 import net.datafaker.Faker;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -37,6 +40,8 @@ class PostControllerTest {
 
     @Autowired
     private Faker faker;
+
+    private final PostMapper mapper = new PostMapper();
 
     @BeforeEach
     void setUp() {
@@ -139,5 +144,21 @@ class PostControllerTest {
                 .andExpect(status().isNoContent());
 
         assertThat(postRepository.findById(post.getId())).isEmpty();
+    }
+    @Test
+    void shouldMapPostToDTO() {
+
+        Post post = new Post();
+        post.setId(1L);
+        post.setTitle("Spring");
+        post.setContent("Content");
+        post.setPublished(true);
+
+        PostDTO dto = mapper.toDTO(post);
+
+        assertEquals(post.getId(), dto.getId());
+        assertEquals(post.getTitle(), dto.getTitle());
+        assertEquals(post.getContent(), dto.getContent());
+        assertEquals(post.isPublished(), dto.isPublished());
     }
 }

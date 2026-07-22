@@ -1,6 +1,8 @@
 package io.hexlet.spring.controller.api;
 
+import io.hexlet.spring.dto.PostDTO;
 import io.hexlet.spring.exception.ResourceNotFoundException;
+import io.hexlet.spring.mapper.PostMapper;
 import io.hexlet.spring.model.Post;
 import io.hexlet.spring.repository.PostRepository;
 import jakarta.validation.Valid;
@@ -17,13 +19,14 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostRepository postRepository;
+    private final PostMapper postMapper;
 
-    public PostController(PostRepository postRepository) {
+    public PostController(PostRepository postRepository, PostMapper postMapper) {
         this.postRepository = postRepository;
+        this.postMapper = postMapper;
     }
-
     @GetMapping
-    public Page<Post> index(
+    public Page<PostDTO> index(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
@@ -33,24 +36,33 @@ public class PostController {
                 Sort.by("createdAt").descending()
         );
 
-        return postRepository.findByPublishedTrue(pageable);
+        return postRepository.findByPublishedTrue(pageable)
+                .map(postMapper::toDTO);
     }
 
     @GetMapping("/{id}")
-    public Post show(@PathVariable Long id) {
-        return postRepository.findById(id)
+    public PostDTO show(@PathVariable Long id) {
+
+        Post post = postRepository.findById(id)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Post with id " + id + " not found"));
+                        new ResourceNotFoundException(
+                                "Post with id " + id + " not found"));
+
+        return postMapper.toDTO(post);
     }
 
     @PostMapping
-    public ResponseEntity<Post> create(@Valid @RequestBody Post post) {
+    public ResponseEntity<PostDTO> create(@Valid @RequestBody Post post) {
+
         Post saved = postRepository.save(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(postMapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> update(
+    public ResponseEntity<PostDTO> update(
             @PathVariable Long id,
             @Valid @RequestBody Post data) {
 
@@ -61,9 +73,10 @@ public class PostController {
         post.setTitle(data.getTitle());
         post.setContent(data.getContent());
         post.setAuthor(data.getAuthor());
-        post.setCreatedAt(data.getCreatedAt());
 
-        return ResponseEntity.ok(postRepository.save(post));
+        Post updated = postRepository.save(post);
+
+        return ResponseEntity.ok(postMapper.toDTO(updated));
     }
 
     @DeleteMapping("/{id}")

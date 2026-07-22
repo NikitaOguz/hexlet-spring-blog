@@ -1,4 +1,6 @@
 package io.hexlet.spring.controller.api;
+import io.hexlet.spring.dto.UserDTO;
+import io.hexlet.spring.mapper.UserMapper;
 import io.hexlet.spring.model.User;
 import io.hexlet.spring.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -17,16 +19,24 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 public class UsersController {
-    private final UserRepository userRepository;
 
-    public UsersController(UserRepository userRepository) {
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+
+    public UsersController(UserRepository userRepository,
+                           UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userRepository.findAll(); // 200
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(userMapper::toDTO)
+                .toList();
     }
+
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
