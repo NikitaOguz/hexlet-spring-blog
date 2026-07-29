@@ -1,4 +1,5 @@
 package io.hexlet.spring.controller.api;
+import io.hexlet.spring.dto.UserCreateDTO;
 import io.hexlet.spring.dto.UserDTO;
 import io.hexlet.spring.mapper.UserMapper;
 import io.hexlet.spring.model.User;
@@ -40,8 +41,16 @@ public class UsersController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@Valid @RequestBody User user) {
-        return userRepository.save(user); // 201
+    public UserDTO createUser(@Valid @RequestBody UserCreateDTO dto) {
+
+        User user = new User();
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+
+        userRepository.save(user);
+
+        return userMapper.toDTO(user);
     }
 
     @DeleteMapping("/{id}")
