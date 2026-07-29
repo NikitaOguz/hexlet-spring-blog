@@ -1,5 +1,6 @@
 package io.hexlet.spring.controller.api;
 
+import io.hexlet.spring.dto.PostCreateDTO;
 import io.hexlet.spring.dto.PostDTO;
 import io.hexlet.spring.exception.ResourceNotFoundException;
 import io.hexlet.spring.mapper.PostMapper;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -52,19 +55,31 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostDTO> create(@Valid @RequestBody Post post) {
+    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody PostCreateDTO dto) {
+        var post = new Post();
+        post.setTitle(dto.getTitle());
+        post.setContent(dto.getContent());
+        post.setPublished(true);
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
 
-        Post saved = postRepository.save(post);
+        postRepository.save(post);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(postMapper.toDTO(saved));
+        var response = new PostDTO();
+        response.setId(post.getId());
+        response.setTitle(post.getTitle());
+        response.setContent(post.getContent());
+        response.setPublished(post.isPublished());
+        response.setCreatedAt(post.getCreatedAt());
+        response.setUpdatedAt(post.getUpdatedAt());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PostDTO> update(
             @PathVariable Long id,
-            @Valid @RequestBody Post data) {
+            @Valid @RequestBody PostCreateDTO data ) {
 
         var post = postRepository.findById(id)
                 .orElseThrow(() ->
@@ -72,7 +87,6 @@ public class PostController {
 
         post.setTitle(data.getTitle());
         post.setContent(data.getContent());
-        post.setAuthor(data.getAuthor());
 
         Post updated = postRepository.save(post);
 

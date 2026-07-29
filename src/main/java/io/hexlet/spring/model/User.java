@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     @GeneratedValue(strategy = IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(unique = true)
