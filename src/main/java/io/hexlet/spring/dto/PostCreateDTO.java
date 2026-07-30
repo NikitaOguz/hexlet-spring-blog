@@ -14,6 +14,5 @@ public class PostCreateDTO {
     private String title;
 
     @NotBlank
-    @Size(min = 10)
     private String content;
 }

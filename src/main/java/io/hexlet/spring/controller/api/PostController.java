@@ -61,20 +61,12 @@ public class PostController {
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
         post.setPublished(true);
-        post.setCreatedAt(LocalDateTime.now());
-        post.setUpdatedAt(LocalDateTime.now());
 
         postRepository.save(post);
 
-        var response = new PostDTO();
-        response.setId(post.getId());
-        response.setTitle(post.getTitle());
-        response.setContent(post.getContent());
-        response.setPublished(post.isPublished());
-        response.setCreatedAt(post.getCreatedAt());
-        response.setUpdatedAt(post.getUpdatedAt());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(postMapper.toDTO(post));
     }
 
     @PutMapping("/{id}")
@@ -88,7 +80,6 @@ public class PostController {
 
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
-        post.setUpdatedAt(LocalDateTime.now());
 
         Post updated = postRepository.save(post);
 
